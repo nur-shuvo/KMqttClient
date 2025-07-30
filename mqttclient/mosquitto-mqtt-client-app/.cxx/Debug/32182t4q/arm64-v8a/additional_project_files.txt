@@ -1,0 +1,1 @@
+E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\src\main\cpp\mosquitto-client-jni.h

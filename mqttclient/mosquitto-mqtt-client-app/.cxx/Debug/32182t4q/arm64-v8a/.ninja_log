@@ -1,0 +1,9 @@
+# ninja log v5
+1	2165	7756104055583395	CMakeFiles/mosquitto_client_android.dir/mosquitto-client-jni.cpp.o	170dbfed4220618f
+2169	2597	7756104059833157	E:/KMqttClient/mqttclient/mosquitto-mqtt-client-app/build/intermediates/cxx/Debug/32182t4q/obj/arm64-v8a/libmosquitto_client_android.so	85925c8d7457a4a7
+31	3133	7756129779239434	CMakeFiles/mosquitto_client_android.dir/mosquitto-client-jni.cpp.o	170dbfed4220618f
+3134	3667	7756129784888110	E:/KMqttClient/mqttclient/mosquitto-mqtt-client-app/build/intermediates/cxx/Debug/32182t4q/obj/arm64-v8a/libmosquitto_client_android.so	85925c8d7457a4a7
+32	2480	7756132835235816	CMakeFiles/mosquitto_client_android.dir/mosquitto-client-jni.cpp.o	170dbfed4220618f
+2481	3082	7756132842526629	E:/KMqttClient/mqttclient/mosquitto-mqtt-client-app/build/intermediates/cxx/Debug/32182t4q/obj/arm64-v8a/libmosquitto_client_android.so	85925c8d7457a4a7
+66	2492	7756138728241280	CMakeFiles/mosquitto_client_android.dir/mosquitto-client-jni.cpp.o	170dbfed4220618f
+2494	2892	7756138732365097	E:/KMqttClient/mqttclient/mosquitto-mqtt-client-app/build/intermediates/cxx/Debug/32182t4q/obj/arm64-v8a/libmosquitto_client_android.so	85925c8d7457a4a7

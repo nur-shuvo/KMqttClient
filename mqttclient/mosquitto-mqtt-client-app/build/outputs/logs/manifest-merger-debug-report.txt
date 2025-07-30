@@ -1,0 +1,14 @@
+-- Merging decision tree log ---
+manifest
+ADDED from E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\src\main\AndroidManifest.xml:2:1-12
+INJECTED from E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\src\main\AndroidManifest.xml:2:1-12
+	package
+		INJECTED from E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\src\main\AndroidManifest.xml
+uses-sdk
+INJECTED from E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\src\main\AndroidManifest.xml
+INJECTED from E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\src\main\AndroidManifest.xml

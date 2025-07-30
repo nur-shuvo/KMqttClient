@@ -1,0 +1,2 @@
+ninja: Entering directory `E:\KMqttClient\mqttclient\mosquitto-mqtt-client-app\.cxx\Debug\32182t4q\arm64-v8a'
+ninja: no work to do.

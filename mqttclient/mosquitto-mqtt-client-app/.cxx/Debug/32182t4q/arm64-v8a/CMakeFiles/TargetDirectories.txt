@@ -1,0 +1,3 @@
+E:/KMqttClient/mqttclient/mosquitto-mqtt-client-app/.cxx/Debug/32182t4q/arm64-v8a/CMakeFiles/mosquitto_client_android.dir
+E:/KMqttClient/mqttclient/mosquitto-mqtt-client-app/.cxx/Debug/32182t4q/arm64-v8a/CMakeFiles/edit_cache.dir
+E:/KMqttClient/mqttclient/mosquitto-mqtt-client-app/.cxx/Debug/32182t4q/arm64-v8a/CMakeFiles/rebuild_cache.dir
