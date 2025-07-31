@@ -106,6 +106,8 @@ result.onSuccess {
 ```kotlin
 client.unSubscribe(subscribeFlowable)
 ```
+## SSL/TLS connection (Authentication support)
+Coming soon
 
 ## 🧪 Example: Full Integration ie. in `MainActivity`
 
