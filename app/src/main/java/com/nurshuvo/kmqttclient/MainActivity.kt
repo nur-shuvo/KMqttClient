@@ -3,6 +3,33 @@ package com.nurshuvo.kmqttclient
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.nurshuvo.kmqtt.internal.MqttClient
 import com.nurshuvo.kmqtt.internal.MqttClientConfig
@@ -17,20 +44,11 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
-private const val TAG = "MainActivity"
-private const val SERVER_HOST = "nurshuvo675676"
-
-/**
- * Demonstrates a simple usage of the library with TCP connection.
- */
+@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
 
     private val client = createClient()
-    private val subscribeFlowable =
-        createSubscribeFlowable(
-            topic = "topic/new/shuvo",
-            qos = MqttQos.AT_MOST_ONCE
-        )
+    private lateinit var subscribeFlowable: MqttSubscribedPublishFlowable
 
     private fun createClient(): MqttClient = MqttClient(
         MqttClientConfig(
@@ -41,76 +59,136 @@ class MainActivity : ComponentActivity() {
         )
     )
 
-    private fun createSubscribeFlowable(
-        topic: String,
-        qos: MqttQos
-    ): MqttSubscribedPublishFlowable {
-        val mqttSubscribe = MqttSubscribe(topic, qos)
-        return client.subscribe(
-            mqttSubscribe
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MqttScreen()
+        }
+    }
+
+    @Composable
+    fun MqttScreen() {
+        val scope = rememberCoroutineScope()
+        var isConnected by remember { mutableStateOf(false) }
+        var messageLog by remember { mutableStateOf(listOf<String>()) }
+        var publishMessage by remember { mutableStateOf("Hello MQTT!") }
+
+        fun log(message: String) {
+            messageLog = messageLog + message
+        }
+
+        Scaffold(
+            topBar = {
+                TopAppBar(title = { Text("KMqtt Sample") })
+            },
+            content = { padding ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(onClick = {
+                        scope.launch {
+                            val connectResult = client.connect(
+                                MqttConnect(
+                                    keepAlive = 60,
+                                    reconnectDelay = 1,
+                                    sendMaximum = 20,
+                                    receiveMaximum = 20,
+                                    authentication = Authentication.NoAuthentication
+                                )
+                            )
+                            connectResult.onSuccess {
+                                isConnected = true
+                                log("✅ Connected to broker")
+                            }.onFailure {
+                                log("❌ Connection failed: ${it.message}")
+                            }
+                        }
+                    }) {
+                        Text("Connect")
+                    }
+
+                    Button(
+                        onClick = {
+                            if (!isConnected) {
+                                log("⚠️ Not connected to broker")
+                                return@Button
+                            }
+                            subscribeFlowable = client.subscribe(
+                                MqttSubscribe(
+                                    topic = "topic/new/shuvo",
+                                    qos = MqttQos.AT_MOST_ONCE
+                                )
+                            )
+                            scope.launch {
+                                subscribeFlowable.collect {
+                                    val received = "📥 Received : ${it.topic}: ${it.payload}"
+                                    log(received)
+                                }
+                            }
+                            log("🔔 Subscribed to topic topic/new/shuvo")
+                        }
+                    ) {
+                        Text("Subscribe")
+                    }
+
+                    OutlinedTextField(
+                        value = publishMessage,
+                        onValueChange = { publishMessage = it },
+                        label = { Text("Message to Publish") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Button(
+                        onClick = {
+                            if (!isConnected) {
+                                log("⚠️ Not connected to broker")
+                                return@Button
+                            }
+                            scope.launch {
+                                val result = client.publish(
+                                    MqttPublish(
+                                        topic = "topic/new/shuvo",
+                                        payload = publishMessage,
+                                        qos = MqttQos.AT_MOST_ONCE,
+                                        retain = false
+                                    )
+                                )
+                                result.onSuccess {
+                                    log("📤 Published message: \"$publishMessage\"")
+                                }.onFailure {
+                                    log("❌ Publish failed: ${it.message}")
+                                }
+                            }
+                        }
+                    ) {
+                        Text("Publish")
+                    }
+
+                    Divider()
+
+                    Text("📨 Messages Received:", style = MaterialTheme.typography.titleMedium)
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .border(1.dp, Color.Gray)
+                            .padding(8.dp)
+                    ) {
+                        items(messageLog) { msg ->
+                            Text(text = msg, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
         )
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        connectToMqttBroker()
-        publishMessageWithDelay()
-    }
-
-    private fun connectToMqttBroker() {
-        lifecycleScope.launch {
-            val mqttConnect = MqttConnect(
-                keepAlive = 60,
-                reconnectDelay = 1,
-                sendMaximum = 20,
-                receiveMaximum = 20,
-                authentication = Authentication.NoAuthentication
-            )
-            val connectResult = client.connect(mqttConnect)
-            connectResult.onSuccess {
-                Log.d(TAG, "Connect: result success $it")
-                observeIncomingMessages()
-            }.onFailure {
-                Log.d(TAG, "Connect: result failure $it")
-            }
-        }
-    }
-
-    private fun publishMessageWithDelay() {
-        lifecycleScope.launch {
-            while (isActive) {
-                delay(30.seconds)
-                val mqttPublish = MqttPublish(
-                    topic = "topic/new/shuvo",
-                    payload = "payload",
-                    qos = MqttQos.AT_MOST_ONCE,
-                    retain = false
-                )
-                client.publish(mqttPublish)
-                    .onSuccess {
-                        Log.d(TAG, "publish: result success $it")
-                    }.onFailure {
-                        Log.d(TAG, "publish: result failure $it")
-                    }
-            }
-        }
-    }
-
-    private fun observeIncomingMessages() {
-        lifecycleScope.launch {
-            subscribeFlowable.collect {
-                Log.d(TAG, "received message topic: ${it.topic} payload: ${it.payload}")
-            }
-        }
-    }
-
-    private fun unSubscribe() {
-        lifecycleScope.launch {
-            client.unSubscribe(subscribeFlowable)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
+    companion object {
+        private const val TAG = "MainActivity"
+        private const val SERVER_HOST = "nurshuvo675676"
     }
 }
