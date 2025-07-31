@@ -1,12 +1,12 @@
 package com.nurshuvo.kmqtt.internal.message.connack
 
 import androidx.annotation.Keep
-import com.nurshuvo.kmqtt.internal.annotation.CrucialClassForJNI
-import com.nurshuvo.kmqtt.internal.annotation.CrucialFieldForJNI
+import com.nurshuvo.kmqtt.internal.annotation.CarefulRenameClassForJNI
+import com.nurshuvo.kmqtt.internal.annotation.CarefulFieldForJNI
 
-@CrucialClassForJNI
+@CarefulRenameClassForJNI
 @Keep
 data class MqttConnAck(
-    @CrucialFieldForJNI val code: Int,
-    @CrucialFieldForJNI val descriptor: String,
+    @CarefulFieldForJNI val code: Int,
+    @CarefulFieldForJNI val descriptor: String,
 )

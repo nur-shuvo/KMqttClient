@@ -1,19 +1,19 @@
 package com.nurshuvo.kmqtt.internal.native
 
 import androidx.annotation.Keep
-import com.nurshuvo.kmqtt.internal.handler.connect.MqttConnectHandler
-import com.nurshuvo.kmqtt.internal.handler.publish.incoming.MqttIncomingPublishHandler
-import com.nurshuvo.kmqtt.internal.handler.publish.outgoing.MqttOutGoingPublishHandler
-import com.nurshuvo.kmqtt.internal.handler.subscribe.MqttSubscriptionHandler
-import com.nurshuvo.kmqtt.internal.handler.unsubscribe.MqttUnsubscribeHandler
-import com.nurshuvo.kmqtt.internal.qos.MqttQos
+import com.nurshuvo.kmqtt.internal.controller.connect.MqttConnectHandler
+import com.nurshuvo.kmqtt.internal.controller.publish.incoming.MqttIncomingPublishHandler
+import com.nurshuvo.kmqtt.internal.controller.publish.outgoing.KMqttOutGoingPublishHandler
+import com.nurshuvo.kmqtt.internal.controller.subscribe.KMqttSubscriptionHandler
+import com.nurshuvo.kmqtt.internal.controller.unsubscribe.MqttUnsubscribeHandler
+import com.nurshuvo.kmqtt.internal.MqttQos
 
 @Keep
 class ClientComponent(
     private val connectHandler: MqttConnectHandler,
-    private val outGoingPublishHandler: MqttOutGoingPublishHandler,
+    private val outGoingPublishHandler: KMqttOutGoingPublishHandler,
     private val incomingPublishHandler: MqttIncomingPublishHandler,
-    private val subscriptionHandler: MqttSubscriptionHandler,
+    private val subscriptionHandler: KMqttSubscriptionHandler,
     private val unsubscribeHandler: MqttUnsubscribeHandler,
 ) : NativeClientComponent() {
 

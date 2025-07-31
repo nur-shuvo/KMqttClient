@@ -5,30 +5,20 @@ import java.util.Collections
 
 class ClientSubscriptions {
 
-    private val subscriptions =
-        Collections.synchronizedList(mutableListOf<MqttSubscribe>())
+    private val subscriptionList = Collections.synchronizedList(mutableListOf<MqttSubscribe>())
 
-    fun add(
-        mqttSubscribe: MqttSubscribe,
-    ) {
-        subscriptions.add(mqttSubscribe)
+    fun add(subscription: MqttSubscribe) {
+        subscriptionList.add(subscription)
     }
 
-    fun remove(
-        topic: String,
-    ) {
-        subscriptions.removeIf {
-            it.topic == topic
-        }
+    fun remove(topic: String) {
+        subscriptionList.removeIf { it.topic == topic }
     }
 
-    fun getAll(): List<MqttSubscribe> =
-        subscriptions.toList()
+    fun getAll(): List<MqttSubscribe> = subscriptionList.toList()
 
     fun getTopics(): List<String> =
-        subscriptions
-            .map {
-                it.topic
-            }.toSet()
-            .toList()
+        subscriptionList
+            .map { it.topic }
+            .distinct()
 }

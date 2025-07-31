@@ -8,7 +8,7 @@ package com.nurshuvo.kmqtt.internal.annotation
  */
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.SOURCE)
-annotation class CrucialFieldForJNI
+annotation class CarefulFieldForJNI
 
 /**
  * Marks a class as crucial for JNI access.
@@ -18,4 +18,4 @@ annotation class CrucialFieldForJNI
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class CrucialClassForJNI
+annotation class CarefulRenameClassForJNI

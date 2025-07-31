@@ -1,10 +1,10 @@
 package com.nurshuvo.kmqtt.internal.message.connect
 
 import androidx.annotation.Keep
-import com.nurshuvo.kmqtt.internal.annotation.CrucialClassForJNI
+import com.nurshuvo.kmqtt.internal.annotation.CarefulRenameClassForJNI
 
 @Keep
-@CrucialClassForJNI
+@CarefulRenameClassForJNI
 sealed interface Authentication {
     @Keep
     data class TlsAuthentication(

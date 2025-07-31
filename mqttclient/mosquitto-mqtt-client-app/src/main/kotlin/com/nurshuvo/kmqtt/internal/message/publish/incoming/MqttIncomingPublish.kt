@@ -1,6 +1,6 @@
 package com.nurshuvo.kmqtt.internal.message.publish.incoming
 
-import com.nurshuvo.kmqtt.internal.qos.MqttQos
+import com.nurshuvo.kmqtt.internal.MqttQos
 
 class MqttIncomingPublish(
     val topic: String,

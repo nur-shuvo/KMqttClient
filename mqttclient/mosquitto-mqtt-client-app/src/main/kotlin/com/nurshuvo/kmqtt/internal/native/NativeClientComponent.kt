@@ -2,14 +2,14 @@ package com.nurshuvo.kmqtt.internal.native
 
 import androidx.annotation.Keep
 import com.nurshuvo.kmqtt.internal.MqttClientConfig
-import com.nurshuvo.kmqtt.internal.annotation.CrucialClassForJNI
+import com.nurshuvo.kmqtt.internal.annotation.CarefulRenameClassForJNI
 import com.nurshuvo.kmqtt.internal.message.connack.MqttConnAck
 import com.nurshuvo.kmqtt.internal.message.publish.outgoing.MqttPublishAck
 import com.nurshuvo.kmqtt.internal.message.subscribe.MqttSubAck
 import com.nurshuvo.kmqtt.internal.message.unsubscribe.MqttUnSubAck
 
 @Keep
-@CrucialClassForJNI
+@CarefulRenameClassForJNI
 abstract class NativeClientComponent :
     NativeConnectEvent,
     NativeDisconnectEvent,

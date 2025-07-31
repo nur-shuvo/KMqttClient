@@ -1,13 +1,13 @@
 package com.nurshuvo.kmqtt.internal.message.publish.outgoing
 
 import androidx.annotation.Keep
-import com.nurshuvo.kmqtt.internal.annotation.CrucialClassForJNI
-import com.nurshuvo.kmqtt.internal.annotation.CrucialFieldForJNI
+import com.nurshuvo.kmqtt.internal.annotation.CarefulRenameClassForJNI
+import com.nurshuvo.kmqtt.internal.annotation.CarefulFieldForJNI
 
-@CrucialClassForJNI
+@CarefulRenameClassForJNI
 @Keep
 data class MqttPublishAck(
-    @CrucialFieldForJNI val code: Int,
-    @CrucialFieldForJNI val descriptor: String,
-    @CrucialFieldForJNI val messageID: Int,
+    @CarefulFieldForJNI val code: Int,
+    @CarefulFieldForJNI val descriptor: String,
+    @CarefulFieldForJNI val messageID: Int,
 )

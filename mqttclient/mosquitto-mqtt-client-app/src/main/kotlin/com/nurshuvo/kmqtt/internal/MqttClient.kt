@@ -1,7 +1,5 @@
 package com.nurshuvo.kmqtt.internal
 
-import com.nurshuvo.kmqtt.internal.constants.INVALID_FLOWABLE_TYPE
-import com.nurshuvo.kmqtt.internal.ClientComponent
 import com.nurshuvo.kmqtt.internal.flowable.FlowableWithSingle
 import com.nurshuvo.kmqtt.internal.flowable.MqttSubscribedPublishFlowable
 import com.nurshuvo.kmqtt.internal.message.connack.MqttConnAck
@@ -24,7 +22,6 @@ class MqttClient private constructor() {
 
     companion object {
         fun builder() = MqttClientBuilder()
-
         init {
             System.loadLibrary("mosquitto_client_android")
         }
@@ -61,7 +58,6 @@ class MqttClient private constructor() {
         flowable: FlowableWithSingle<*, *>,
     ): Result<MqttUnSubAck> {
         val unsubscribeHandler = clientComponent.unsubscribeHandler
-
         return if (flowable is MqttSubscribedPublishFlowable) {
             unsubscribeHandler.unsubscribe(flowable)
         } else {

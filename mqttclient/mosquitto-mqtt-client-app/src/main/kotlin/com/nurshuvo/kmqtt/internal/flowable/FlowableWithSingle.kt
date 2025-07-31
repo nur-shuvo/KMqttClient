@@ -1,5 +1,6 @@
 package com.nurshuvo.kmqtt.internal.flowable
 
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.launch
 
+@OptIn(FlowPreview::class)
 abstract class FlowableWithSingle<T, S> : AbstractFlow<T>() {
     var singleConsumer: ((S) -> Unit)? = null
     private var job: Job? = null

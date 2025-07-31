@@ -8,31 +8,27 @@ class MqttClientBuilder {
 
     fun setIdentifier(
         identifier: String,
-    ) =
-        apply {
-            this.identifier = identifier
-        }
+    ) = apply {
+        this.identifier = identifier
+    }
 
     fun setServerHost(
         serverHost: String,
-    ) =
-        apply {
-            this.serverHost = serverHost
-        }
+    ) = apply {
+        this.serverHost = serverHost
+    }
 
     fun setServerPort(
         serverPort: Int,
-    ) =
-        apply {
-            this.serverPort = serverPort
-        }
+    ) = apply {
+        this.serverPort = serverPort
+    }
 
     fun setCleanSession(
         cleanSession: Boolean,
-    ) =
-        apply {
-            this.cleanSession = cleanSession
-        }
+    ) = apply {
+        this.cleanSession = cleanSession
+    }
 
     fun build(): MqttClient {
         return MqttClient(buildClientConfig())

@@ -3,10 +3,10 @@ package com.nurshuvo.kmqtt.internal.flowable
 import com.nurshuvo.kmqtt.internal.ClientComponent
 import com.nurshuvo.kmqtt.internal.MqttClientConfig
 import com.nurshuvo.kmqtt.internal.callbacks.SubscribedPublishListener
-import com.nurshuvo.kmqtt.internal.exceptions.subscribe.SubscribeFailException
-import com.nurshuvo.kmqtt.internal.handler.subscribe.result.MqttSubscriptionResult
-import com.nurshuvo.kmqtt.internal.handler.subscribe.result.MqttSubscriptionResult.Failed
-import com.nurshuvo.kmqtt.internal.handler.subscribe.result.MqttSubscriptionResult.Success
+import com.nurshuvo.kmqtt.internal.customerror.subscribe.SubscribeFailException
+import com.nurshuvo.kmqtt.internal.controller.subscribe.result.MqttSubscriptionResult
+import com.nurshuvo.kmqtt.internal.controller.subscribe.result.MqttSubscriptionResult.Failed
+import com.nurshuvo.kmqtt.internal.controller.subscribe.result.MqttSubscriptionResult.Success
 import com.nurshuvo.kmqtt.internal.message.publish.incoming.MqttIncomingPublish
 import com.nurshuvo.kmqtt.internal.message.publish.outgoing.MqttPublish
 import com.nurshuvo.kmqtt.internal.message.subscribe.MqttSubAck
@@ -36,7 +36,7 @@ class MqttSubscribedPublishFlowable(
                 callback,
             )
             awaitClose {
-                clientComponent.mqttCallbacks.unRegisterCallback(
+                clientComponent.kMqttCallbacks.unRegisterCallback(
                     subscribe.topic,
                     callback,
                 )

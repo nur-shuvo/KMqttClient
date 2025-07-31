@@ -1,6 +1,6 @@
 package com.nurshuvo.kmqtt.internal.message.subscribe
 
-import com.nurshuvo.kmqtt.internal.qos.MqttQos
+import com.nurshuvo.kmqtt.internal.MqttQos
 
 class MqttSubscribe(
     val topic: String,

@@ -1,6 +1,6 @@
 package com.nurshuvo.kmqtt.internal.callbacks
 
-import com.nurshuvo.kmqtt.internal.exceptions.subscribe.SubscribeFailException
+import com.nurshuvo.kmqtt.internal.customerror.subscribe.SubscribeFailException
 import com.nurshuvo.kmqtt.internal.message.publish.outgoing.MqttPublish
 import com.nurshuvo.kmqtt.internal.message.subscribe.MqttSubAck
 

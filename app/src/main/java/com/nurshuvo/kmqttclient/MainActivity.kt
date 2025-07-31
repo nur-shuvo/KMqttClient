@@ -38,7 +38,7 @@ import com.nurshuvo.kmqtt.internal.message.connect.Authentication
 import com.nurshuvo.kmqtt.internal.message.connect.MqttConnect
 import com.nurshuvo.kmqtt.internal.message.publish.outgoing.MqttPublish
 import com.nurshuvo.kmqtt.internal.message.subscribe.MqttSubscribe
-import com.nurshuvo.kmqtt.internal.qos.MqttQos
+import com.nurshuvo.kmqtt.internal.MqttQos
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch

@@ -1,23 +1,23 @@
 package com.nurshuvo.kmqtt.internal
 
 import androidx.annotation.Keep
-import com.nurshuvo.kmqtt.internal.annotation.CrucialClassForJNI
-import com.nurshuvo.kmqtt.internal.annotation.CrucialFieldForJNI
+import com.nurshuvo.kmqtt.internal.annotation.CarefulRenameClassForJNI
+import com.nurshuvo.kmqtt.internal.annotation.CarefulFieldForJNI
 import com.nurshuvo.kmqtt.internal.message.connect.Authentication
 import com.nurshuvo.kmqtt.internal.message.connect.MqttConnect
 
-@CrucialClassForJNI
+@CarefulRenameClassForJNI
 @Keep
 data class MqttClientConfig(
-    @CrucialFieldForJNI var identifier: String = DEFAULT_CLIENT_IDENTIFIER,
-    @CrucialFieldForJNI var serverHost: String = DEFAULT_SERVER_HOST,
-    @CrucialFieldForJNI var serverPort: Int = DEFAULT_SERVER_PORT,
-    @CrucialFieldForJNI var cleanSession: Boolean = DEFAULT_CLEAN_SESSION,
-    @CrucialFieldForJNI var keepAlive: Int = DEFAULT_KEEP_ALIVE,
-    @CrucialFieldForJNI var reconnectDelay: Int = DEFAULT_MQTT_RECONNECT_DELAY_SEC,
-    @CrucialFieldForJNI var sendMaximum: Int = DEFAULT_MQTT_SEND_MAXIMUM,
-    @CrucialFieldForJNI var receiveMaximum: Int = DEFAULT_MQTT_RECEIVE_MAXIMUM,
-    @CrucialFieldForJNI var authentication: Authentication = DEFAULT_AUTHENTICATION,
+    @CarefulFieldForJNI var identifier: String = DEFAULT_CLIENT_IDENTIFIER,
+    @CarefulFieldForJNI var serverHost: String = DEFAULT_SERVER_HOST,
+    @CarefulFieldForJNI var serverPort: Int = DEFAULT_SERVER_PORT,
+    @CarefulFieldForJNI var cleanSession: Boolean = DEFAULT_CLEAN_SESSION,
+    @CarefulFieldForJNI var keepAlive: Int = DEFAULT_KEEP_ALIVE,
+    @CarefulFieldForJNI var reconnectDelay: Int = DEFAULT_MQTT_RECONNECT_DELAY_SEC,
+    @CarefulFieldForJNI var sendMaximum: Int = DEFAULT_MQTT_SEND_MAXIMUM,
+    @CarefulFieldForJNI var receiveMaximum: Int = DEFAULT_MQTT_RECEIVE_MAXIMUM,
+    @CarefulFieldForJNI var authentication: Authentication = DEFAULT_AUTHENTICATION,
 ) {
 
     companion object {

@@ -1,28 +1,28 @@
 package com.nurshuvo.kmqtt.internal
 
-import com.nurshuvo.kmqtt.internal.callbacks.MqttCallbacks
-import com.nurshuvo.kmqtt.internal.handler.MqttSession
-import com.nurshuvo.kmqtt.internal.handler.connect.MqttConnectHandlerImpl
-import com.nurshuvo.kmqtt.internal.handler.publish.incoming.MqttIncomingPublishHandlerImpl
-import com.nurshuvo.kmqtt.internal.handler.publish.outgoing.MqttOutGoingPublishHandlerImpl
-import com.nurshuvo.kmqtt.internal.handler.subscribe.MqttSubscriptionHandlerImpl
-import com.nurshuvo.kmqtt.internal.handler.unsubscribe.MqttUnsubscribeHandlerImpl
+import com.nurshuvo.kmqtt.internal.callbacks.KMqttCallbacks
+import com.nurshuvo.kmqtt.internal.controller.MqttSession
+import com.nurshuvo.kmqtt.internal.controller.connect.MqttConnectHandlerImpl
+import com.nurshuvo.kmqtt.internal.controller.publish.incoming.MqttIncomingPublishHandlerImpl
+import com.nurshuvo.kmqtt.internal.controller.publish.outgoing.KMqttOutGoingPublishHandlerImpl
+import com.nurshuvo.kmqtt.internal.controller.subscribe.KMqttSubscriptionHandlerImpl
+import com.nurshuvo.kmqtt.internal.controller.unsubscribe.MqttUnsubscribeHandlerImpl
 import com.nurshuvo.kmqtt.internal.native.ClientComponent
 import com.nurshuvo.kmqtt.internal.subscriptions.ClientSubscriptions
 
 class ClientComponent {
 
-    val mqttCallbacks = MqttCallbacks()
+    val kMqttCallbacks = KMqttCallbacks()
     private val clientSubscriptions = ClientSubscriptions()
-    val subscriptionHandler = MqttSubscriptionHandlerImpl(clientSubscriptions)
+    val subscriptionHandler = KMqttSubscriptionHandlerImpl(clientSubscriptions)
 
     private val incomingPublishHandler =
         MqttIncomingPublishHandlerImpl(
             clientSubscriptions = clientSubscriptions,
-            mqttCallbacks = mqttCallbacks,
+            kMqttCallbacks = kMqttCallbacks,
         )
 
-    val outGoingPublishHandler = MqttOutGoingPublishHandlerImpl()
+    val outGoingPublishHandler = KMqttOutGoingPublishHandlerImpl()
 
     private val mqttSession = MqttSession(
         subscriptionHandler = subscriptionHandler,
@@ -32,7 +32,7 @@ class ClientComponent {
     val unsubscribeHandler =
         MqttUnsubscribeHandlerImpl(
             clientSubscriptions = clientSubscriptions,
-            mqttCallbacks = mqttCallbacks,
+            kMqttCallbacks = kMqttCallbacks,
         )
 
     val clientComponent = ClientComponent(
