@@ -112,40 +112,101 @@ Coming soon
 ## 🧪 Example: Full Integration ie. in `MainActivity`
 
 ```kotlin
+private const val TAG = "MainActivity"
+private const val SERVER_HOST = "nurshuvo675676"
+
+/**
+ * Demonstrates a simple usage of the library with TCP connection.
+ */
 class MainActivity : ComponentActivity() {
 
-    private val client = MqttClient(...)
-    private val subscribeFlowable = client.subscribe(...)
+    private val client = createClient()
+    private val subscribeFlowable =
+        createSubscribeFlowable(
+            topic = "topic/new/shuvo",
+            qos = MqttQos.AT_MOST_ONCE
+        )
+
+    private fun createClient(): MqttClient = MqttClient(
+        MqttClientConfig(
+            identifier = SERVER_HOST,
+            serverHost = "broker.hivemq.com",
+            serverPort = 1883,
+            cleanSession = true
+        )
+    )
+
+    private fun createSubscribeFlowable(
+        topic: String,
+        qos: MqttQos
+    ): MqttSubscribedPublishFlowable {
+        val mqttSubscribe = MqttSubscribe(topic, qos)
+        return client.subscribe(
+            mqttSubscribe
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        connectToBroker()
-        startPublishing()
+        connectToMqttBroker()
+        publishMessageWithDelay()
     }
 
-    private fun connectToBroker() {
+    private fun connectToMqttBroker() {
         lifecycleScope.launch {
-            client.connect(...).onSuccess {
-                observeMessages()
+            val mqttConnect = MqttConnect(
+                keepAlive = 60,
+                reconnectDelay = 1,
+                sendMaximum = 20,
+                receiveMaximum = 20,
+                authentication = Authentication.NoAuthentication
+            )
+            val connectResult = client.connect(mqttConnect)
+            connectResult.onSuccess {
+                Log.d(TAG, "Connect: result success $it")
+                observeIncomingMessages()
+            }.onFailure {
+                Log.d(TAG, "Connect: result failure $it")
             }
         }
     }
 
-    private fun observeMessages() {
-        lifecycleScope.launch {
-            subscribeFlowable.collect {
-                Log.d(TAG, "Incoming: ${it.payload}")
-            }
-        }
-    }
-
-    private fun startPublishing() {
+    private fun publishMessageWithDelay() {
         lifecycleScope.launch {
             while (isActive) {
                 delay(30.seconds)
-                client.publish(...).onSuccess { ... }
+                val mqttPublish = MqttPublish(
+                    topic = "topic/new/shuvo",
+                    payload = "payload",
+                    qos = MqttQos.AT_MOST_ONCE,
+                    retain = false
+                )
+                client.publish(mqttPublish)
+                    .onSuccess {
+                        Log.d(TAG, "publish: result success $it")
+                    }.onFailure {
+                        Log.d(TAG, "publish: result failure $it")
+                    }
             }
         }
+    }
+
+    private fun observeIncomingMessages() {
+        lifecycleScope.launch {
+            subscribeFlowable.collect {
+                Log.d(TAG, "received message topic: ${it.topic} payload: ${it.payload}")
+            }
+        }
+    }
+
+    private fun unSubscribe() {
+        lifecycleScope.launch {
+            client.unSubscribe(subscribeFlowable)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 }
 ```
