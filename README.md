@@ -4,9 +4,9 @@ KMqtt is a Kotlin-first, coroutine-friendly MQTT client built on top of [mqtt 5.
 
 ## 🧬 How It Works
 
-Mosutitto is designed with a minimal, idiomatic Kotlin approach to abstract away the complexity of MQTT protocol handling.
+KMqtt is designed with a minimal, idiomatic Kotlin approach to abstract away the complexity of MQTT protocol handling.
 
-- 🏗️ **NDK & CMake**: Under the hood, Mosutitto uses native code via the NDK, built using CMake, for high-performance MQTT operations.
+- 🏗️ **NDK & CMake**: Under the hood, it used Mosutitto C code that runs native code via the NDK, built using CMake, for high-performance MQTT operations.
 - 🔄 **Coroutines + Flow**: Coroutine and Flow APIs make it easy to handle asynchronous publish/subscribe operations.
 - 🧠 **Topic Matching**: Built-in topic matcher ensures you receive only what you're subscribed to.
 - ✨ **Simplified API**: Cleaner abstractions and DSL-style configuration reduce boilerplate and make integration seamless.
