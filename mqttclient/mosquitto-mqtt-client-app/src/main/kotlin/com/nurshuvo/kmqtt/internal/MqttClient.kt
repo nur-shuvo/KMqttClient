@@ -24,6 +24,7 @@ class MqttClient private constructor() {
 
     companion object {
         fun builder() = MqttClientBuilder()
+
         init {
             System.loadLibrary("mosquitto_client_android")
         }
@@ -37,16 +38,13 @@ class MqttClient private constructor() {
         return connectHandler.connect(clientConfig, clientComponent)
     }
 
-    fun <T> subscribe(
-        type: Class<T>,
+    fun subscribe(
         mqttSubscribe: MqttSubscribe,
-    ) =
-        MqttSubscribedPublishFlowable(
-            type,
-            clientConfig,
-            clientComponent,
-            mqttSubscribe,
-        )
+    ) = MqttSubscribedPublishFlowable(
+        clientConfig,
+        clientComponent,
+        mqttSubscribe,
+    )
 
     suspend fun publish(
         mqttPublish: MqttPublish,
@@ -64,7 +62,7 @@ class MqttClient private constructor() {
     ): Result<MqttUnSubAck> {
         val unsubscribeHandler = clientComponent.unsubscribeHandler
 
-        return if (flowable is MqttSubscribedPublishFlowable<*>) {
+        return if (flowable is MqttSubscribedPublishFlowable) {
             unsubscribeHandler.unsubscribe(flowable)
         } else {
             Result.failure(IllegalArgumentException(INVALID_FLOWABLE_TYPE))

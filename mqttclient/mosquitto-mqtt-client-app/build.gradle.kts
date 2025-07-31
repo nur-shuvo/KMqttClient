@@ -21,18 +21,19 @@ android {
 
         externalNativeBuild {
             cmake {
-                cppFlags += listOf("-fexceptions", "-frtti")
+                cppFlags += listOf("-std=c++17", "-fexceptions", "-frtti")
+                arguments += listOf(
+                    "-DANDROID_STL=c++_static",
+                    "-DANDROID_DEBUG=1"
+                )
             }
-        }
-
-        ndk {
-            abiFilters += listOf("arm64-v8a") // Add others like "armeabi-v7a" if needed
         }
     }
 
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
         }
     }
 

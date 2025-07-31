@@ -1,13 +1,5 @@
 #include "mosquitto-client-jni.h"
 
-static int password_callback(char *buf, int size, int rwflag, void *userdata) {
-    char *password = decode(INTERNAL_CLIENT_PRIVATE_KEY_PASSWORD);
-    strncpy(buf, password, size);
-    buf[size - 1] = '\0';
-    free(password);
-    return (int) strlen(buf);
-}
-
 void on_log_callback(struct mosquitto *mosq, void *userdata, int level, const char *message) {
     if (level == MOSQ_LOG_ERR) {
         LOGE("level: [Error]: %s\n", message);
@@ -188,7 +180,7 @@ Java_com_nurshuvo_kmqtt_internal_native_NativeClientComponent_connect(
                 nullptr,
                 clientCertStr,
                 privateKeyStr,
-                password_callback
+                nullptr
         );
 
         env->ReleaseStringUTFChars(caPath, caPathStr);

@@ -17,15 +17,14 @@ import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
-class MqttSubscribedPublishFlowable<T>(
-    val type: Class<T>,
+class MqttSubscribedPublishFlowable(
     val clientConfig: MqttClientConfig,
     val clientComponent: ClientComponent,
     val subscribe: MqttSubscribe,
-) : FlowableWithSingle<MqttIncomingPublish<T>, MqttSubscriptionResult>() {
+) : FlowableWithSingle<MqttIncomingPublish, MqttSubscriptionResult>() {
 
     override suspend fun produceFlow(
-        resultChannel: Channel<MqttIncomingPublish<T>>,
+        resultChannel: Channel<MqttIncomingPublish>,
     ) {
         val subscriptionHandler = clientComponent.subscriptionHandler
         callbackFlow {
@@ -52,7 +51,7 @@ class MqttSubscribedPublishFlowable<T>(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun ProducerScope<MqttIncomingPublish<T>>.getSubscribedPublishListener() =
+    private fun ProducerScope<MqttIncomingPublish>.getSubscribedPublishListener() =
         object : SubscribedPublishListener {
 
             override fun onSuccess(
@@ -72,17 +71,14 @@ class MqttSubscribedPublishFlowable<T>(
             ) {
                 if (!isClosedForSend) {
                     runCatching {
-//                        trySend(
-//                            MqttIncomingPublish(
-//                                topic = mqttPublish.topic,
-//                                payload = MqttSerializer.adapter.fromJson(
-//                                    mqttPublish.payload,
-//                                    type,
-//                                ),
-//                                qos = mqttPublish.qos,
-//                                retain = mqttPublish.retain,
-//                            ),
-//                        )
+                        trySend(
+                            MqttIncomingPublish(
+                                topic = mqttPublish.topic,
+                                payload = mqttPublish.payload,
+                                qos = mqttPublish.qos,
+                                retain = mqttPublish.retain,
+                            ),
+                        )
                     }.onFailure {
                         //logcat(ERROR) { "Error in serialization, cause: ${it.message}" }
                     }

@@ -25,7 +25,7 @@ class MqttUnsubscribeHandlerImpl(
     private val singleRunner = SingleRunner()
 
     override suspend fun unsubscribe(
-        subscribedPublishFlowable: MqttSubscribedPublishFlowable<*>,
+        subscribedPublishFlowable: MqttSubscribedPublishFlowable,
     ): Result<MqttUnSubAck> {
         stopCallerFlow(subscribedPublishFlowable)
 
@@ -47,7 +47,7 @@ class MqttUnsubscribeHandlerImpl(
 
     private suspend fun unsubscribeReal(
         topic: String,
-        subscribedPublishFlowable: MqttSubscribedPublishFlowable<*>,
+        subscribedPublishFlowable: MqttSubscribedPublishFlowable,
         clientID: String,
     ): Result<MqttUnSubAck> {
         clientSubscriptions.remove(topic)
@@ -84,7 +84,7 @@ class MqttUnsubscribeHandlerImpl(
         }
     }
 
-    private suspend fun stopCallerFlow(subscribedPublishFlowable: MqttSubscribedPublishFlowable<*>) {
+    private suspend fun stopCallerFlow(subscribedPublishFlowable: MqttSubscribedPublishFlowable) {
         singleRunner.afterPrevious {
             subscribedPublishFlowable.close()
         }

@@ -30,12 +30,9 @@ class MqttConnectHandlerImpl(
         clientComponent: ClientComponent,
     ): Result<MqttConnAck> {
         return controlledRunner.joinPreviousOrRun {
-            Log.d("MqttConnectHandlerImpl", "connect: config $clientConfig")
             val returnResult = clientComponent.clientComponent.connect(clientConfig)
-            Log.d("MqttConnectHandlerImpl", "connect: return code $returnResult")
-
             if (returnResult.code != MOSQUITTO_API_SUCCESS_CODE) {
-                return@joinPreviousOrRun Result.failure<MqttConnAck>(
+                return@joinPreviousOrRun Result.failure(
                     ConnectionFailException.SystemAPIException(
                         returnResult.code,
                         returnResult.descriptor,
@@ -59,7 +56,7 @@ class MqttConnectHandlerImpl(
                         Result.success(ack)
                     }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Result.failure(
                     ConnectionFailException.TimeOutException(
                         TIMEOUT_ERROR_CODE,

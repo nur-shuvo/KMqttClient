@@ -6,7 +6,7 @@ import com.nurshuvo.kmqtt.internal.message.unsubscribe.MqttUnSubAck
 interface MqttUnsubscribeHandler {
 
     suspend fun unsubscribe(
-        subscribedPublishFlowable: MqttSubscribedPublishFlowable<*>,
+        subscribedPublishFlowable: MqttSubscribedPublishFlowable,
     ): Result<MqttUnSubAck>
 
     fun onUnSubAckReceived(
