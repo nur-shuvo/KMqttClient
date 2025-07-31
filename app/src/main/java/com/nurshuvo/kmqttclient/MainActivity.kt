@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.nurshuvo.kmqtt.internal.MqttClient
 import com.nurshuvo.kmqtt.internal.MqttClientConfig
 import com.nurshuvo.kmqtt.internal.flowable.MqttSubscribedPublishFlowable
+import com.nurshuvo.kmqtt.internal.message.connect.Authentication
 import com.nurshuvo.kmqtt.internal.message.connect.MqttConnect
 import com.nurshuvo.kmqtt.internal.message.publish.outgoing.MqttPublish
 import com.nurshuvo.kmqtt.internal.message.subscribe.MqttSubscribe
@@ -58,7 +59,13 @@ class MainActivity : ComponentActivity() {
 
     private fun connectToMqttBroker() {
         lifecycleScope.launch {
-            val mqttConnect = MqttConnect.builder().build()
+            val mqttConnect = MqttConnect(
+                keepAlive = 60,
+                reconnectDelay = 1,
+                sendMaximum = 20,
+                receiveMaximum = 20,
+                authentication = Authentication.NoAuthentication
+            )
             val connectResult = client.connect(mqttConnect)
             connectResult.onSuccess {
                 Log.d(TAG, "Connect: result success $it")
@@ -94,6 +101,12 @@ class MainActivity : ComponentActivity() {
             subscribeFlowable.collect {
                 Log.d(TAG, "received message topic: ${it.topic} payload: ${it.payload}")
             }
+        }
+    }
+
+    private fun unSubscribe() {
+        lifecycleScope.launch {
+            client.unSubscribe(subscribeFlowable)
         }
     }
 
