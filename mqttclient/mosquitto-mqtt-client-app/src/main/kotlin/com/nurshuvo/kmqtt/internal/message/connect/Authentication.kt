@@ -9,8 +9,8 @@ sealed interface Authentication {
     @Keep
     data class TlsAuthentication(
         val certificateAuthorityPath: String,
-        val clientCertificatePath: String,
-        val privateKeyPath: String,
+        val clientCertificatePath: String? = null,
+        val privateKeyPath: String? = null,
     ) : Authentication
 
     @Keep

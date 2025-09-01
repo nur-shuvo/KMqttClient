@@ -170,9 +170,9 @@ Java_com_nurshuvo_kmqtt_internal_native_NativeClientComponent_connect(
         jstring serverCert = (jstring) env->GetObjectField(auth, clientCertificatePathField);
         jstring privateKey = (jstring) env->GetObjectField(auth, privateKeyField);
 
-        const char *caPathStr = env->GetStringUTFChars(caPath, 0);
-        const char *clientCertStr = env->GetStringUTFChars(serverCert, 0);
-        const char *privateKeyStr = env->GetStringUTFChars(privateKey, 0);
+        const char *caPathStr = caPath ? env->GetStringUTFChars(caPath, nullptr) : nullptr;
+        const char *clientCertStr = serverCert ? env->GetStringUTFChars(serverCert, nullptr) : nullptr;
+        const char *privateKeyStr = privateKey ? env->GetStringUTFChars(privateKey, nullptr) : nullptr;
 
         mosquitto_tls_set(
                 globalMosquittoContext->mosquittoClientsMap[clientIDStr],
@@ -183,9 +183,15 @@ Java_com_nurshuvo_kmqtt_internal_native_NativeClientComponent_connect(
                 nullptr
         );
 
-        env->ReleaseStringUTFChars(caPath, caPathStr);
-        env->ReleaseStringUTFChars(serverCert, clientCertStr);
-        env->ReleaseStringUTFChars(privateKey, privateKeyStr);
+        if (caPath && caPathStr) {
+            env->ReleaseStringUTFChars(caPath, caPathStr);
+        }
+        if (serverCert && clientCertStr) {
+            env->ReleaseStringUTFChars(serverCert, clientCertStr);
+        }
+        if (privateKey && privateKeyStr) {
+            env->ReleaseStringUTFChars(privateKey, privateKeyStr);
+        }
     }
     else if (env->IsInstanceOf(auth, noAuthClass)) {}
     else {
