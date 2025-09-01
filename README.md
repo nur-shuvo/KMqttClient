@@ -105,10 +105,24 @@ result.onSuccess {
 ```kotlin
 client.unSubscribe(subscribeFlowable)
 ```
-## SSL/TLS connection (Authentication support)
-Coming soon
+## SSL/TLS connection
+### TLS encrypted, Unauthenticated
+```
+client?.connect(
+        MqttConnect(
+            keepAlive = 60,
+            reconnectDelay = 1,
+            sendMaximum = 20,
+            receiveMaximum = 20,
+            authentication = Authentication.TlsAuthentication(
+                certificateAuthorityPath = certPath,
+            )
+        )
+    )
+```
+### TLS encrypted, Authenticated (Coming soon)
 
-## 🧪 Example: Full Integration ie. in `MainActivity`
+## 🧪 Example: Full Integration TCP connection ie. in `MainActivity`
 
 ```kotlin
 private const val TAG = "MainActivity"
