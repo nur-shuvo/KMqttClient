@@ -2,11 +2,9 @@ plugins {
     alias(libs.plugins.android.library)
     id("org.jetbrains.kotlin.kapt")
     kotlin("android")
-    `maven-publish`
 }
 
-version = "1.0.0"
-group = "com.github.nurshuvo"
+version = "4.0.0"
 
 kotlin {
     jvmToolchain(21)
@@ -55,18 +53,4 @@ dependencies {
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
     implementation(libs.moshi.adapters)
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
-                groupId = "com.github.nurshuvo"
-                artifactId = "kmqtt"
-                version = "1.0.0"
-
-                from(components["release"])
-            }
-        }
-    }
 }
