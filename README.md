@@ -21,9 +21,20 @@ KMqtt is designed with a minimal, idiomatic Kotlin approach to abstract away the
 
 ## 📦 Installation
 
-Coming soon to **Maven Central** / **JitPack**.
+Add the Maven Central repository (if not already added):
 
-For now, include it as a local module:
+```kotlin
+repositories {
+    mavenCentral()
+}
+```
+
+Then add the dependency in your build.gradle.kts:
+
+```dependencies {
+    implementation("io.github.nur-shuvo:KMqttClient:1.0.0")
+}
+```
 
 ## 🛠️ Basic Usage
 
