@@ -2,9 +2,10 @@ plugins {
     alias(libs.plugins.android.library)
     id("org.jetbrains.kotlin.kapt")
     kotlin("android")
+    id("com.vanniktech.maven.publish") version "0.29.0"
 }
 
-version = "4.0.0"
+version = "1.0.0"
 
 kotlin {
     jvmToolchain(21)

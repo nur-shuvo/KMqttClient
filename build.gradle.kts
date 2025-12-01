@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
 //    alias(libs.plugins.dagger.hilt) apply false
 //    id("com.google.dagger.hilt.android") version "2.47" apply false
+    id("com.vanniktech.maven.publish") version "0.29.0"
 }
 
 buildscript {
