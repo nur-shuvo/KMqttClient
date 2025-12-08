@@ -2,6 +2,16 @@
 
 KMqtt is a low latency Kotlin-first, coroutine-friendly MQTT client built on top of [mqtt 5.0](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html) and also supports mqtt 3.0. It simplifies MQTT integration in Android and Kotlin applications by offering clean, idiomatic APIs.
 
+## 🚀 Motivation
+
+KMqttClient was created to provide a modern, Kotlin-first, coroutine-friendly MQTT client for developers building IoT and realtime applications. Existing MQTT clients in the JVM ecosystem are often designed with older Java patterns, include heavy abstractions, or introduce unnecessary overhead. This library aims to offer a cleaner, more idiomatic alternative that integrates naturally with Kotlin and Android projects.
+
+A core motivation behind KMqttClient is performance. By building on top of a lightweight native MQTT implementation and exposing only the essential, modern Kotlin APIs, KMqttClient stays fast, efficient, and minimal. Unlike larger MQTT libraries that carry additional layers, legacy features, or broad compatibility code, KMqttClient focuses on being small in size, low in memory footprint, and fast in message handling. This makes it especially suitable for resource-constrained environments such as mobile devices, embedded systems, and IoT clients.
+
+By open-sourcing the library under the MIT license, the aim is to promote collaboration and provide a reliable, community-driven tool that evolves over time. Developers no longer need to reinvent the wheel or manually wrap native MQTT libraries — KMqttClient offers a simple, efficient, and extensible foundation.
+
+Ultimately, KMqttClient exists to make MQTT development in Kotlin easier, faster, and more lightweight, while contributing to an open-source ecosystem where shared improvements benefit everyone.
+
 ## 🧬 How It Works
 
 KMqtt is designed with a minimal, idiomatic Kotlin approach to abstract away the complexity of MQTT protocol handling.
