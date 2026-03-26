@@ -120,6 +120,8 @@ Java_com_nurshuvo_kmqtt_internal_native_NativeClientComponent_connect(
     jfieldID sendMaxField = (*env).GetFieldID(configClass, "sendMaximum", "I");
     jfieldID receiveMaxField = (*env).GetFieldID(configClass, "receiveMaximum", "I");
     jfieldID authField = (*env).GetFieldID(configClass, "authentication", "Lcom/nurshuvo/kmqtt/internal/message/connect/Authentication;");
+    jfieldID usernameField = (*env).GetFieldID(configClass, "username", "Ljava/lang/String;");
+    jfieldID passwordField = (*env).GetFieldID(configClass, "password", "Ljava/lang/String;");
 
     jstring identifier = (jstring) (*env).GetObjectField(clientConfig, idField);
     jstring serverHost = (jstring) (*env).GetObjectField(clientConfig, hostField);
@@ -130,6 +132,8 @@ Java_com_nurshuvo_kmqtt_internal_native_NativeClientComponent_connect(
     jint sendMaximum = (*env).GetIntField(clientConfig, sendMaxField);
     jint receiveMaximum = (*env).GetIntField(clientConfig, receiveMaxField);
     jobject auth = env->GetObjectField(clientConfig, authField);
+    jstring username = (jstring) (*env).GetObjectField(clientConfig, usernameField);
+    jstring password = (jstring) (*env).GetObjectField(clientConfig, passwordField);
 
     const char *clientIDStr = env->GetStringUTFChars(identifier, 0);
     const char *hostStr = env->GetStringUTFChars(serverHost, 0);
@@ -157,6 +161,19 @@ Java_com_nurshuvo_kmqtt_internal_native_NativeClientComponent_connect(
                          MOSQ_OPT_SEND_MAXIMUM,
                          sendMaximum
     );
+    if (username != nullptr) {
+        const char *usernameStr = env->GetStringUTFChars(username, nullptr);
+        const char *passwordStr = password ? env->GetStringUTFChars(password, nullptr) : nullptr;
+        mosquitto_username_pw_set(
+                globalMosquittoContext->mosquittoClientsMap[clientIDStr],
+                usernameStr,
+                passwordStr
+        );
+        env->ReleaseStringUTFChars(username, usernameStr);
+        if (password && passwordStr) {
+            env->ReleaseStringUTFChars(password, passwordStr);
+        }
+    }
 
     jclass tlsAuthClass = env->FindClass("com/nurshuvo/kmqtt/internal/message/connect/Authentication$TlsAuthentication");
     jclass noAuthClass = env->FindClass("com/nurshuvo/kmqtt/internal/message/connect/Authentication$NoAuthentication");

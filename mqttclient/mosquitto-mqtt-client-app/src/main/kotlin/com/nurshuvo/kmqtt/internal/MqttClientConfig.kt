@@ -1,8 +1,8 @@
 package com.nurshuvo.kmqtt.internal
 
 import androidx.annotation.Keep
-import com.nurshuvo.kmqtt.internal.annotation.CarefulRenameClassForJNI
 import com.nurshuvo.kmqtt.internal.annotation.CarefulFieldForJNI
+import com.nurshuvo.kmqtt.internal.annotation.CarefulRenameClassForJNI
 import com.nurshuvo.kmqtt.internal.message.connect.Authentication
 import com.nurshuvo.kmqtt.internal.message.connect.MqttConnect
 
@@ -18,6 +18,8 @@ data class MqttClientConfig(
     @CarefulFieldForJNI var sendMaximum: Int = DEFAULT_MQTT_SEND_MAXIMUM,
     @CarefulFieldForJNI var receiveMaximum: Int = DEFAULT_MQTT_RECEIVE_MAXIMUM,
     @CarefulFieldForJNI var authentication: Authentication = DEFAULT_AUTHENTICATION,
+    @CarefulFieldForJNI var username: String? = null,
+    @CarefulFieldForJNI var password: String? = null,
 ) {
 
     companion object {
