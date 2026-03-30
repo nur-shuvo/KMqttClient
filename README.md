@@ -42,7 +42,7 @@ repositories {
 Then add the dependency in your build.gradle.kts:
 
 ```dependencies {
-    implementation("io.github.nur-shuvo:KMqttClient:1.0.0")
+    implementation("io.github.nur-shuvo:KMqttClient:1.0.1")
 }
 ```
 
