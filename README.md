@@ -1,6 +1,9 @@
 # 🛰️ KMqtt – Kotlin MQTT Client Library (Syntactic sugar of [Mosquitto](https://github.com/eclipse-mosquitto/mosquitto))
 
-KMqtt is a low latency Kotlin-first, coroutine-friendly MQTT client built on top of [mqtt 5.0](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html) and also supports mqtt 3.0. It simplifies MQTT integration in Android and Kotlin applications by offering clean, idiomatic APIs.
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.nur-shuvo/KMqttClient.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.nur-shuvo/KMqttClient)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+KMqtt is a low latency, Kotlin-first, coroutine-friendly [MQTT 5.0](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html) client for **Android**. It simplifies MQTT integration by offering clean, idiomatic APIs on top of the native Mosquitto C library.
 
 ## 🚀 Motivation
 
@@ -16,18 +19,31 @@ Ultimately, KMqttClient exists to make MQTT development in Kotlin easier, faster
 
 KMqtt is designed with a minimal, idiomatic Kotlin approach to abstract away the complexity of MQTT protocol handling.
 
-- 🏗️ **NDK, CMake and JNI**: Under the hood, it used Mosquitto C code that runs native code via the NDK, built using CMake. JNI is used to bridge Kotlin with native code, enabling high-performance MQTT operations.
+- 🏗️ **NDK, CMake and JNI**: Under the hood, it uses Mosquitto C code that runs natively via the NDK, built using CMake. JNI bridges Kotlin with native code, enabling high-performance MQTT operations.
 - 🔄 **Coroutines + Flow**: Coroutine and Flow APIs make it easy to handle asynchronous publish/subscribe operations.
-- 🧠 **Topic Matching**: Built-in topic matcher ensures you receive only what you're subscribed to.
-- ✨ **Simplified API**: Cleaner abstractions and DSL-style configuration reduce boilerplate and make integration seamless.
+- 🧠 **Topic Matching**: Built-in topic matcher ensures you receive only what you're subscribed to, including `+` and `#` wildcards.
+- ✨ **Simplified API**: Clean abstractions and optional builder APIs reduce boilerplate and make integration seamless.
 
 ## 🚀 Features
 
 - 🧹 Clean, idiomatic Kotlin APIs
-- ✅ Supports MQTT 5.0 and 3.0
-- 🔄 Coroutine-based publish/subscribe
-- 🔐 Pluggable authentication support
+- ✅ MQTT 5.0 protocol
+- 🔄 Coroutine-based publish/subscribe with `Flow`
+- 🔐 Username/password, TLS, and mutual-TLS authentication
+- 🎚️ Full QoS 0 / 1 / 2 support
 - 📦 Lightweight and modular
+
+## 📋 Requirements
+
+| Requirement | Value |
+|-------------|-------|
+| Platform    | Android only (ships native `.so` libraries) |
+| `minSdk`    | 29 |
+| `compileSdk`| 34 |
+| JDK         | 21 |
+| ABIs        | `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64` |
+
+> **Note:** This is an Android library (`com.android.library`) with a JNI layer. It does not run on plain Kotlin/JVM or Kotlin Multiplatform targets.
 
 ## 📦 Installation
 
@@ -39,14 +55,41 @@ repositories {
 }
 ```
 
-Then add the dependency in your build.gradle.kts:
+Then add the dependency in your `build.gradle.kts`:
 
-```dependencies {
+```kotlin
+dependencies {
     implementation("io.github.nur-shuvo:KMqttClient:1.0.1")
 }
 ```
 
+Finally, declare the internet permission in your app's `AndroidManifest.xml` — the library does not declare it for you:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+### Imports
+
+All public types live under `com.nurshuvo.kmqtt.internal`:
+
+```kotlin
+import com.nurshuvo.kmqtt.internal.MqttClient
+import com.nurshuvo.kmqtt.internal.MqttClientConfig
+import com.nurshuvo.kmqtt.internal.MqttQos
+import com.nurshuvo.kmqtt.internal.controller.subscribe.result.MqttSubscriptionResult
+import com.nurshuvo.kmqtt.internal.flowable.MqttSubscribedPublishFlowable
+import com.nurshuvo.kmqtt.internal.message.connect.Authentication
+import com.nurshuvo.kmqtt.internal.message.connect.MqttConnect
+import com.nurshuvo.kmqtt.internal.message.publish.outgoing.MqttPublish
+import com.nurshuvo.kmqtt.internal.message.subscribe.MqttSubscribe
+```
+
 ## 🛠️ Basic Usage
+
+> `connect`, `publish`, and `unSubscribe` are **suspend** functions — call them from a coroutine
+> (for example `lifecycleScope.launch { ... }`). `subscribe` is not suspending; it returns a cold
+> `Flow` that starts the subscription when you collect it.
 
 ### 1. Create an `MqttClient` instance
 
@@ -64,20 +107,22 @@ val client = MqttClient(
 ### 2. Connect to MQTT Broker
 
 ```kotlin
-val connectResult = client.connect(
-    MqttConnect(
-        keepAlive = 60,
-        reconnectDelay = 1,
-        sendMaximum = 20,
-        receiveMaximum = 20,
-        authentication = Authentication.NoAuthentication
+lifecycleScope.launch {
+    val connectResult = client.connect(
+        MqttConnect(
+            keepAlive = 60,
+            reconnectDelay = 1,
+            sendMaximum = 20,
+            receiveMaximum = 20,
+            authentication = Authentication.NoAuthentication
+        )
     )
-)
 
-connectResult.onSuccess {
-    Log.d(TAG, "Connected successfully!")
-}.onFailure {
-    Log.e(TAG, "Connection failed", it)
+    connectResult.onSuccess { connAck ->
+        Log.d(TAG, "Connected successfully! code=${connAck.code} ${connAck.descriptor}")
+    }.onFailure {
+        Log.e(TAG, "Connection failed", it)
+    }
 }
 ```
 
@@ -102,55 +147,157 @@ lifecycleScope.launch {
 }
 ```
 
+To observe whether the SUBSCRIBE itself was acknowledged by the broker, attach a single-result
+consumer **before** collecting:
+
+```kotlin
+subscribeFlowable.doOnSingle { result ->
+    when (result) {
+        is MqttSubscriptionResult.Success ->
+            Log.d(TAG, "SUBACK code=${result.subAck.code} id=${result.subAck.messageID}")
+        is MqttSubscriptionResult.Failed ->
+            Log.e(TAG, "Subscribe failed", result.exception)
+    }
+}
+```
+
 ### 4. Publish a Message
 
 ```kotlin
-val result = client.publish(
-    MqttPublish(
-        topic = "topic/new/shuvo",
-        payload = "Hello MQTT!",
-        qos = MqttQos.AT_MOST_ONCE,
-        retain = false
-    )
-)
-
-result.onSuccess {
-    Log.d(TAG, "Published successfully")
-}.onFailure {
-    Log.e(TAG, "Publish failed", it)
+lifecycleScope.launch {
+    client.publish(
+        MqttPublish(
+            topic = "topic/new/shuvo",
+            payload = "Hello MQTT!",
+            qos = MqttQos.AT_MOST_ONCE,
+            retain = false
+        )
+    ).onSuccess {
+        Log.d(TAG, "Published successfully")
+    }.onFailure {
+        Log.e(TAG, "Publish failed", it)
+    }
 }
 ```
 
 ### 5. Unsubscribe
 
 ```kotlin
-client.unSubscribe(subscribeFlowable)
+lifecycleScope.launch {
+    client.unSubscribe(subscribeFlowable)
+}
 ```
-## SSL/TLS connection
-### TLS encrypted, Unauthenticated
+
+## 🔐 Authentication
+
+### Username & password
+
+Credentials are supplied through `MqttClientConfig` (not through `MqttConnect`):
+
+```kotlin
+val client = MqttClient(
+    MqttClientConfig(
+        identifier = "client-id",
+        serverHost = "broker.hivemq.com",
+        serverPort = 1883,
+        cleanSession = true,
+        username = "my-username",
+        password = "my-password"
+    )
+)
 ```
-client?.connect(
-        MqttConnect(
-            keepAlive = 60,
-            reconnectDelay = 1,
-            sendMaximum = 20,
-            receiveMaximum = 20,
-            authentication = Authentication.TlsAuthentication(
-                certificateAuthorityPath = certPath,
-            )
+
+This can be combined with any of the TLS modes below.
+
+### TLS encrypted, unauthenticated
+
+Verifies the broker with a CA certificate; the client presents no certificate of its own.
+
+```kotlin
+client.connect(
+    MqttConnect(
+        keepAlive = 60,
+        reconnectDelay = 1,
+        sendMaximum = 20,
+        receiveMaximum = 20,
+        authentication = Authentication.TlsAuthentication(
+            certificateAuthorityPath = certPath
         )
     )
+)
 ```
-### TLS encrypted, Authenticated (Coming soon)
 
-## 🧪 Example: Full Integration TCP connection ie. in `MainActivity`
+### TLS encrypted, authenticated (mutual TLS)
+
+Additionally presents a client certificate and private key to the broker.
+
+```kotlin
+client.connect(
+    MqttConnect(
+        keepAlive = 60,
+        reconnectDelay = 1,
+        sendMaximum = 20,
+        receiveMaximum = 20,
+        authentication = Authentication.TlsAuthentication(
+            certificateAuthorityPath = caPath,
+            clientCertificatePath = clientCertPath,
+            privateKeyPath = privateKeyPath
+        )
+    )
+)
+```
+
+All paths are filesystem paths readable by your app — copy bundled assets into
+`context.filesDir` (or similar) before connecting.
+
+> The sample app currently demonstrates TCP and TLS-unauthenticated only; mutual TLS is
+> supported by the API but not yet covered by a sample screen.
+
+## 🏗️ Builder APIs
+
+Every configuration object also exposes a builder, useful from Java or when values are assembled
+conditionally:
+
+```kotlin
+val client = MqttClient.builder()
+    .setIdentifier("client-id")
+    .setServerHost("broker.hivemq.com")
+    .setServerPort(1883)
+    .setCleanSession(true)
+    .build()
+
+val connect = MqttConnect.builder()
+    .setKeepALive(60)
+    .setReconnectDelay(1)
+    .setSendMaximum(20)
+    .setReceiveMaximum(20)
+    .setAuthentication(Authentication.NoAuthentication)
+    .build()
+
+val subscribe = MqttSubscribe.builder()
+    .setTopicFilter("topic/new/shuvo")
+    .setQos(MqttQos.AT_MOST_ONCE)
+    .build()
+
+val publish = MqttPublish.builder()
+    .setTopic("topic/new/shuvo")
+    .setPayload("Hello MQTT!")
+    .setQos(MqttQos.AT_MOST_ONCE)
+    .setRetain(false)
+    .build()
+```
+
+> `MqttClientBuilder` does not expose `username`/`password`; use the `MqttClientConfig`
+> constructor when you need credentials.
+
+## 🧪 Example: Full Integration over TCP
 
 ```kotlin
 private const val TAG = "MainActivity"
-private const val SERVER_HOST = "nurshuvo675676"
+private const val CLIENT_ID = "nurshuvo675676"
 
 /**
- * Demonstrates a simple usage of the library with TCP connection.
+ * Demonstrates a simple usage of the library with a TCP connection.
  */
 class MainActivity : ComponentActivity() {
 
@@ -163,7 +310,7 @@ class MainActivity : ComponentActivity() {
 
     private fun createClient(): MqttClient = MqttClient(
         MqttClientConfig(
-            identifier = SERVER_HOST,
+            identifier = CLIENT_ID,
             serverHost = "broker.hivemq.com",
             serverPort = 1883,
             cleanSession = true
@@ -175,9 +322,7 @@ class MainActivity : ComponentActivity() {
         qos: MqttQos
     ): MqttSubscribedPublishFlowable {
         val mqttSubscribe = MqttSubscribe(topic, qos)
-        return client.subscribe(
-            mqttSubscribe
-        )
+        return client.subscribe(mqttSubscribe)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -195,13 +340,13 @@ class MainActivity : ComponentActivity() {
                 receiveMaximum = 20,
                 authentication = Authentication.NoAuthentication
             )
-            val connectResult = client.connect(mqttConnect)
-            connectResult.onSuccess {
-                Log.d(TAG, "Connect: result success $it")
-                observeIncomingMessages()
-            }.onFailure {
-                Log.d(TAG, "Connect: result failure $it")
-            }
+            client.connect(mqttConnect)
+                .onSuccess {
+                    Log.d(TAG, "Connect: result success $it")
+                    observeIncomingMessages()
+                }.onFailure {
+                    Log.d(TAG, "Connect: result failure $it")
+                }
         }
     }
 
@@ -232,33 +377,44 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    private fun unSubscribe() {
-        lifecycleScope.launch {
-            client.unSubscribe(subscribeFlowable)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
 }
 ```
 
+A runnable sample app lives in the [`app`](app) module, with separate screens for TCP and
+TLS-unauthenticated connections.
+
 ## 🧩 API Overview
 
-| Feature        | Object configuration          |
-|----------------|----------------------|
-| Connect        | `MqttConnect`        |
-| Publish        | `MqttPublish`        |
-| Subscribe      | `MqttSubscribe`      |
-| Unsubscribe    | `client.unSubscribe()` |
+| Operation      | Call                     | Configuration object | Result |
+|----------------|--------------------------|----------------------|--------|
+| Connect        | `client.connect(...)`    | `MqttConnect`        | `Result<MqttConnAck>` |
+| Publish        | `client.publish(...)`    | `MqttPublish`        | `Result<MqttPublishAck>` |
+| Subscribe      | `client.subscribe(...)`  | `MqttSubscribe`      | `MqttSubscribedPublishFlowable` (a `Flow<MqttIncomingPublish>`) |
+| Unsubscribe    | `client.unSubscribe(...)`| the flowable from `subscribe` | `Result<MqttUnSubAck>` |
+
+| Concept        | Type |
+|----------------|------|
 | Authentication | `Authentication.NoAuthentication`, `Authentication.TlsAuthentication` |
-| QoS Support    | `MqttQos` (0, 1, 2)   |
+| QoS            | `MqttQos.AT_MOST_ONCE` (0), `MqttQos.AT_LEAST_ONCE` (1), `MqttQos.EXACTLY_ONCE` (2) |
+| Incoming message | `MqttIncomingPublish(topic, payload, qos, retain)` |
+| Subscribe ack  | `MqttSubscriptionResult.Success` / `MqttSubscriptionResult.Failed` via `doOnSingle` |
 
 ## 🤝 Contributing
 
 We welcome all contributions — whether it's fixing bugs, improving documentation, adding new features, or writing sample apps. Your ideas and feedback are valuable!
+
+### Building from source
+
+```bash
+git clone https://github.com/nur-shuvo/KMqttClient.git
+cd KMqttClient
+./gradlew build                                      # build everything
+./gradlew :mqttclient:mosquitto-mqtt-client-app:build # library only
+./gradlew :app:installDebug                          # run the sample app
+./gradlew publishToMavenLocal                        # publish locally for testing
+```
+
+Building the native layer requires NDK `29.0.13599879` and CMake `3.22.1`.
 
 ### Ways to Contribute
 
@@ -267,8 +423,16 @@ We welcome all contributions — whether it's fixing bugs, improving documentati
 - 📝 Enhance documentation
 - 💡 Suggest new features or improvements
 - 🐞 Report or fix bugs
-  
+
+Please open an [issue](https://github.com/nur-shuvo/KMqttClient/issues) to discuss substantial
+changes before sending a pull request.
+
+## 📄 License
+
+Released under the [MIT License](LICENSE).
+
 ## Built by
+
 Asaduzzaman Nur Shuvo
 
 Email: nurshuvo51@gmail.com
