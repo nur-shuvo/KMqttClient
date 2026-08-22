@@ -13,3 +13,4 @@
 .cxx
 /gradle.properties
 /kmqttclient-maven-credentials
+/build/
